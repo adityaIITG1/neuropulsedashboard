@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import DataWorkbench from '@/components/data-workbench';
+import { matchesSegment, SegmentFilters, categoryValue } from '@/lib/segmentation';
 import {
   Activity,
   Zap,
@@ -57,6 +59,9 @@ interface ReportItem {
   recordingSite?: string;
   exercise?: string;
   exerciseMode?: string;
+  condition?: string;
+  sufferingCondition?: string;
+  patientCondition?: string;
   durationSeconds: number;
   activityGrade: number;
   activityGradeText?: string;
@@ -87,6 +92,8 @@ export default function NeuroPulseAnalyticsDashboard() {
   const [loading, setLoading] = useState(true);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
   const [selectedSessionId, setSelectedSessionId] = useState<string>('');
+  const [segmentFilters, setSegmentFilters] = useState<SegmentFilters>({});
+  const [excludedIds, setExcludedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState('ALL');
   const [selectedGenderFilter, setSelectedGenderFilter] = useState('ALL');
@@ -139,14 +146,14 @@ export default function NeuroPulseAnalyticsDashboard() {
         selectedGenderFilter === 'ALL' ||
         item.patientGender?.toLowerCase() === selectedGenderFilter.toLowerCase();
 
-      return matchesSearch && matchesMuscle && matchesGender;
+      return matchesSearch && matchesMuscle && matchesGender && matchesSegment(item, segmentFilters) && !excludedIds.includes(item.SessionId);
     });
-  }, [reports, searchQuery, selectedMuscleFilter, selectedGenderFilter]);
+  }, [reports, searchQuery, selectedMuscleFilter, selectedGenderFilter, segmentFilters, excludedIds]);
 
   // Selected session for deep single-trace clinical examination
   const selectedSession = useMemo(() => {
-    return reports.find((r) => r.SessionId === selectedSessionId) || reports[0];
-  }, [reports, selectedSessionId]);
+    return filteredReports.find((r) => r.SessionId === selectedSessionId) || filteredReports[0];
+  }, [filteredReports, selectedSessionId]);
 
   // KPI Calculations
   const totalSessions = filteredReports.length;
@@ -163,10 +170,10 @@ export default function NeuroPulseAnalyticsDashboard() {
   }, [filteredReports, totalSessions]);
 
   const avgGrade = useMemo(() => {
-    if (!totalSessions) return 0;
-    const sum = filteredReports.reduce((acc, r) => acc + (r.activityGrade ?? 0), 0);
-    return +(sum / totalSessions).toFixed(2);
-  }, [filteredReports, totalSessions]);
+    const measured = filteredReports.filter(r => Number.isFinite(r.activityGrade));
+    if (!measured.length) return 'N/A';
+    return +(measured.reduce((sum, r) => sum + r.activityGrade, 0) / measured.length).toFixed(2);
+  }, [filteredReports]);
 
   const avgSustainedSec = useMemo(() => {
     if (!totalSessions) return 0;
@@ -194,14 +201,10 @@ export default function NeuroPulseAnalyticsDashboard() {
 
   // Demographics: Age distribution
   const ageDistributionData = useMemo(() => {
-    const buckets: { [key: string]: number } = { '< 25 Y': 0, '25 - 40 Y': 0, '41 - 60 Y': 0, '60+ Y': 0 };
-    filteredReports.forEach((r) => {
-      const ageNum = parseInt(r.patientAge, 10);
-      if (!Number.isFinite(ageNum)) return;
-      if (ageNum < 25) buckets['< 25 Y']++;
-      else if (ageNum <= 40) buckets['25 - 40 Y']++;
-      else if (ageNum <= 60) buckets['41 - 60 Y']++;
-      else buckets['60+ Y']++;
+    const buckets: { [key: string]: number } = {};
+    filteredReports.forEach(r => {
+      const group = categoryValue(r, 'ageGroup');
+      buckets[group] = (buckets[group] || 0) + 1;
     });
     return Object.entries(buckets).map(([ageGroup, count]) => ({ ageGroup, count }));
   }, [filteredReports]);
@@ -343,6 +346,7 @@ export default function NeuroPulseAnalyticsDashboard() {
 
       {/* 3. MAIN DASHBOARD CONTENT */}
       <main className="flex-1 p-6 space-y-6 max-w-[1700px] w-full mx-auto">
+        <DataWorkbench reports={reports} visible={filteredReports} filters={segmentFilters} setFilters={setSegmentFilters} excluded={excludedIds} setExcluded={setExcludedIds} refresh={fetchReports} />
         {fetchError && <div role="alert" className="rounded-xl border border-red-500/40 bg-red-950/30 p-5 text-red-200"><h2 className="font-bold">Reports connection failed</h2><p className="mt-1 text-sm">{fetchError}</p><p className="mt-1 text-sm">Use Sync AWS Data to retry. No reports are displayed while the connection is unavailable.</p></div>}
         {!fetchError && reports.length === 0 && <div role="status" className="rounded-xl border border-slate-700 bg-slate-900 p-5"><h2 className="font-bold">{loading ? 'Loading real reports?' : 'No reports available'}</h2><p className="mt-1 text-sm text-slate-400">{loading ? 'Checking the reports service.' : 'The reports service returned no sessions. Upload a recording, then sync again.'}</p></div>}
         {reports.length > 0 && filteredReports.length === 0 && <div role="status" className="rounded-xl border border-slate-700 p-5">No reports match these filters. Clear the filters to see your sessions.</div>}
@@ -495,7 +499,7 @@ export default function NeuroPulseAnalyticsDashboard() {
             </div>
 
             {/* Quick Session Inspector Callout */}
-            <div className="bg-gradient-to-br from-[#0F172A] to-[#131E35] border border-cyan-500/30 rounded-2xl p-5 lg:col-span-2 shadow-sm flex flex-col justify-between">
+            {selectedSession && <div className="bg-gradient-to-br from-[#0F172A] to-[#131E35] border border-cyan-500/30 rounded-2xl p-5 lg:col-span-2 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">
@@ -530,12 +534,12 @@ export default function NeuroPulseAnalyticsDashboard() {
                   <div className="text-base font-extrabold text-emerald-400">{selectedSession?.mvcReference ?? 'N/A'}</div>
                 </div>
               </div>
-            </div>
+            </div>}
           </div>
         )}
 
         {/* 5. FULL SESSION ACTIVITY GRAPH & FATIGUE EXAMINER */}
-        {(activeTab === 'FATIGUE' || activeTab === 'OVERVIEW') && (
+        {selectedSession && (activeTab === 'FATIGUE' || activeTab === 'OVERVIEW') && (
           <div className="bg-[#0F172A]/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
               <div>
@@ -556,11 +560,11 @@ export default function NeuroPulseAnalyticsDashboard() {
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-400">Select Session:</span>
                 <select
-                  value={selectedSessionId}
+                  value={selectedSession?.SessionId || ''}
                   onChange={(e) => setSelectedSessionId(e.target.value)}
                   className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 font-medium focus:outline-none focus:border-cyan-400 max-w-xs"
                 >
-                  {reports.map((r, idx) => (
+                  {filteredReports.map((r, idx) => (
                     <option key={r.SessionId} value={r.SessionId}>
                       #{idx + 1}: {r.muscle} ({r.patientAge || 'Age unavailable'}, {r.patientGender || 'Gender unavailable'})
                     </option>
@@ -722,7 +726,7 @@ export default function NeuroPulseAnalyticsDashboard() {
       <footer className="border-t border-slate-800/80 bg-[#090E17] px-6 py-4 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 mt-auto">
         <p>© 2026 Debuggers Squad Innovations LLP • NeuroPulseAI Biomedical Research</p>
         <p className="flex items-center gap-1.5">
-          <Shield className="h-3.5 w-3.5 text-cyan-400" /> HIPAA-Compliant De-Identified Telemetry
+          <Shield className="h-3.5 w-3.5 text-cyan-400" /> Session telemetry
         </p>
       </footer>
     </div>
