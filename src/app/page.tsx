@@ -56,6 +56,7 @@ interface ReportItem {
   patientGender: string;
   muscle: string;
   side: string;
+  affectedSide?: string;
   recordingSite?: string;
   exercise?: string;
   exerciseMode?: string;

@@ -1,5 +1,6 @@
-﻿'use client';
+'use client';
 import { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Session, SegmentFilters, categories, metrics, categoryValue, reviewFlags } from '@/lib/segmentation';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
   refresh: () => Promise<void>;
 }
 export default function DataWorkbench({ reports, visible, filters, setFilters, excluded, setExcluded, refresh }: Props) {
+  const [metric, setMetric] = useState<(typeof metrics)[number][0]>('activePercent');
   const [groupBy, setGroupBy] = useState('ageGroup');
   const [selected, setSelected] = useState<string[]>([]);
   const [confirming, setConfirming] = useState(false);
@@ -27,6 +29,16 @@ export default function DataWorkbench({ reports, visible, filters, setFilters, e
     const values = rows.map(r => r[key]).filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
     return values.length ? (values.reduce((a,b) => a+b,0) / values.length).toFixed(2) : 'N/A';
   };
+  const metricLabel = metrics.find(([key]) => key === metric)![1];
+  const metricValues = visible.map(r => r[metric]).filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
+  const stats = metricValues.length ? {
+    mean: (metricValues.reduce((a,b) => a+b,0) / metricValues.length).toFixed(2),
+    min: Math.min(...metricValues).toFixed(2), max: Math.max(...metricValues).toFixed(2),
+  } : null;
+  const metricGroups = Array.from(groups).map(([name,rows]) => {
+    const values = rows.map(r => r[metric]).filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
+    return {name, count: rows.length, measured: values.length, value: values.length ? values.reduce((a,b)=>a+b,0)/values.length : null};
+  });
   const exportData = () => {
     const fields = ['SessionId', ...categories.map(([key]) => key), ...metrics.map(([key]) => key)];
     const quote = (value: unknown) => { let text = String(value ?? ''); if (/^[=+\-@\t\r]/.test(text)) text = "'" + text; return '"' + text.replaceAll('"', '""') + '"'; };
@@ -51,6 +63,16 @@ export default function DataWorkbench({ reports, visible, filters, setFilters, e
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       <label className="text-xs space-y-1">Session identifier<input className={inputClass} value={filters.id || ''} onChange={e => change('id',e.target.value)} placeholder="UUID or part of an ID" /></label>
       {categories.map(([key,label]) => <label key={key} className="text-xs space-y-1">{label}<select className={inputClass} value={filters[key] || ''} onChange={e=>change(key,e.target.value)}><option value="">All</option>{Array.from(new Set(reports.map(r=>categoryValue(r,key)))).sort().map(v=><option key={v}>{v}</option>)}</select></label>)}
+    </div>
+    <div className="rounded-xl border border-cyan-500/30 bg-slate-950/50 p-4 space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <label className="text-sm">Metric to explore<select className={inputClass} value={metric} onChange={e=>setMetric(e.target.value as typeof metric)}>{metrics.map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
+        <label className="text-sm">Compare by<select className={inputClass} value={groupBy} onChange={e=>setGroupBy(e.target.value)}>{categories.map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">{[['Mean',stats?.mean],['Minimum',stats?.min],['Maximum',stats?.max],['Measured sessions',`${metricValues.length} / ${visible.length}`]].map(([label,value])=><div key={label} className="rounded-lg bg-slate-900 p-3"><div className="text-slate-400">{label}</div><div className="text-xl font-bold text-cyan-300">{value ?? 'Not recorded'}</div></div>)}</div>
+      <p className="text-xs text-slate-400">{metricLabel}: mean across recorded values in each group. {visible.length-metricValues.length} sessions have no recorded value. Comparisons describe these sessions and do not establish treatment effects.</p>
+      {metricValues.length > 0 ? <div className="h-72"><ResponsiveContainer width="100%" height="100%"><BarChart data={metricGroups} margin={{bottom:35,left:10,right:20}}><CartesianGrid strokeDasharray="3 3" stroke="#334155" /><XAxis dataKey="name" stroke="#94a3b8" fontSize={11} interval={0} angle={-15} textAnchor="end" /><YAxis stroke="#94a3b8" /><Tooltip contentStyle={{backgroundColor:'#0f172a',borderColor:'#334155'}} /><Bar dataKey="value" name={`Mean ${metricLabel}`} fill="#22d3ee" /></BarChart></ResponsiveContainer></div> : <p role="status" className="text-slate-400">This metric is not recorded in the matching sessions. Select another metric or upload reports containing this field.</p>}
+      <details><summary className="cursor-pointer text-sm">See exact metrics for each matching session</summary><div className="overflow-auto max-h-80"><table className="w-full text-xs text-left"><thead><tr><th className="p-2">Session ID</th>{categories.map(([key,label])=><th className="p-2 whitespace-nowrap" key={key}>{label}</th>)}{metrics.map(([key,label])=><th className="p-2 whitespace-nowrap" key={key}>{label}</th>)}</tr></thead><tbody>{visible.map(r=><tr className="border-t border-slate-800" key={r.SessionId}><td className="p-2 font-mono">{r.SessionId}</td>{categories.map(([key])=><td className="p-2" key={key}>{categoryValue(r,key)}</td>)}{metrics.map(([key])=><td className="p-2" key={key}>{Number.isFinite(r[key]) ? r[key] : 'Not recorded'}</td>)}</tr>)}</tbody></table></div></details>
     </div>
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">{metrics.map(([key,label])=><fieldset key={key} className="space-y-1"><legend className="text-xs">{label}</legend><div className="flex gap-2">{['min','max'].map(bound=><input key={bound} aria-label={`${label} ${bound}`} type="number" min="0" step="any" className={inputClass} placeholder={bound === 'min' ? 'Minimum' : 'Maximum'} value={filters[`${key}_${bound}`] || ''} onChange={e=>change(`${key}_${bound}`,e.target.value)} />)}</div></fieldset>)}</div>
     <div className="flex flex-wrap gap-3 items-center text-sm"><label><input type="checkbox" checked={!!filters.review} onChange={e=>change('review',e.target.checked?'yes':'')} /> Show reports needing review</label><button className="rounded-lg border border-slate-600 px-3 py-2" onClick={exportData}>Export matching data (CSV)</button><span className="text-slate-400">{excluded.length} manually excluded from this view</span></div>

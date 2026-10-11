@@ -1,9 +1,10 @@
-﻿export interface Session {
+export interface Session {
   SessionId: string;
   patientAge?: string;
   patientGender?: string;
   muscle?: string;
   side?: string;
+  affectedSide?: string;
   exerciseMode?: string;
   condition?: string;
   sufferingCondition?: string;
@@ -19,8 +20,8 @@
   graphValues?: unknown[];
 }
 export const categories = [
-  ['ageGroup', 'Age group'], ['patientGender', 'Gender'], ['muscle', 'Target muscle'],
-  ['side', 'Body side'], ['exerciseMode', 'Exercise mode'], ['condition', 'Recorded condition'],
+  ['ageGroup', 'Age group'], ['patientAge', 'Recorded age'], ['patientGender', 'Gender'], ['muscle', 'Target muscle'],
+  ['side', 'Recording side'], ['affectedSide', 'Affected side'], ['exerciseMode', 'Exercise mode'], ['condition', 'Patient condition'],
   ['sessionPattern', 'Activation pattern'], ['signalQuality', 'Signal quality'],
 ] as const;
 export const metrics = [

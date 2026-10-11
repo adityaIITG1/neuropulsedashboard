@@ -1,4 +1,4 @@
-﻿const assert = require('node:assert/strict');
+const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
@@ -20,6 +20,8 @@ assert.equal(matchesSegment(report,{patientGender:'Female'}),false);
 assert.equal(matchesSegment(report,{id:'UUID'}),true);
 assert.equal(reviewFlags({...report,activePercent:110}).some(f=>f.includes('Invalid')),true);
 assert.equal(reviewFlags({...report,activeTimeSec:0,activePercent:0}).some(f=>f.includes('Invalid')),false);
+assert.equal(matchesSegment({...report,affectedSide:'Left',side:'Right',patientCondition:'Stroke',condition:undefined},{affectedSide:'Left',side:'Right',condition:'Stroke',patientAge:'21 Y'}),true);
+assert.equal(matchesSegment({...report,affectedSide:'Left'},{affectedSide:'Right'}),false);
 console.log('Segmentation boundaries, missing data, combined filters, and review flags passed.');
 const json = (body,options)=>({body,status:options?.status||200});
 const env = {DASHBOARD_ADMIN_KEY:'a'.repeat(32),REPORTS_TABLE_NAME:'test-table',REPORTS_DELETE_ENABLED:'true'};
