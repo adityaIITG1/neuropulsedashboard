@@ -1,5 +1,8 @@
 export interface Session {
   SessionId: string;
+  timestamp?: number;
+  startTime?: number | string;
+  exercise?: string;
   patientAge?: string;
   patientGender?: string;
   muscle?: string;
