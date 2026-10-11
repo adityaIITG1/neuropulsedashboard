@@ -1,21 +1,22 @@
 ﻿'use client';
+import ChartWindow from '@/components/chart-window';
 import { Session, categoryValue, metrics } from '@/lib/segmentation';
 import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Legend, Line, Pie, PieChart, ResponsiveContainer, Tooltip, Treemap, XAxis, YAxis } from 'recharts';
 type Metric=(typeof metrics)[number][0];
 const colors=['#4ebcff','#739bff','#ffad72','#6b007b','#ff86c8','#b099ff'];
 function Tile({title,note,children}:{title:string;note:string;children:React.ReactNode}){return <section className="chart-card"><div className="chart-heading"><div><h3>{title}</h3><p>{note}</p></div></div><div className="chart-body">{children}</div></section>;}
-export default function ReportVisuals({reports,metric,compare}:{reports:Session[];metric:Metric;compare:string}){
+export default function ReportVisuals({reports,metric,compare,start=0}:{reports:Session[];metric:Metric;compare:string;start?:number}){
  const names=Array.from(new Set(reports.map(r=>categoryValue(r,compare))));
  const groups=names.map(name=>{const rows=reports.filter(r=>categoryValue(r,compare)===name);const vals=rows.map(r=>r[metric]).filter((v):v is number=>typeof v==='number'&&Number.isFinite(v));return {name,count:rows.length,recorded:vals.length,missing:rows.length-vals.length,value:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null,recordedPercent:rows.length?vals.length/rows.length*100:0,missingPercent:rows.length?(rows.length-vals.length)/rows.length*100:0};});
  const label=metrics.find(([key])=>key===metric)![1];
  const empty=!reports.length?<div className="advanced-empty">No matching sessions.</div>:null;
  const opts={contentStyle:{background:'#fff',border:'1px solid #ddd',fontSize:10}};
- return <>
+ return <ChartWindow start={start} end={start+2}>
  <Tile title="Stacked columns · measurement coverage" note={`Recorded and missing ${label} by selected cohort`}>{empty||<ResponsiveContainer><BarChart data={groups}><XAxis dataKey="name" tick={{fontSize:9}}/><YAxis allowDecimals={false} tick={{fontSize:9}}/><Tooltip {...opts}/><Legend wrapperStyle={{fontSize:9}}/><Bar isAnimationActive={false} dataKey="recorded" name="Recorded" stackId="coverage" fill="#4ebcff"/><Bar isAnimationActive={false} dataKey="missing" name="Missing" stackId="coverage" fill="#d9e2ef"/></BarChart></ResponsiveContainer>}</Tile>
  <Tile title="100% stacked bars · completeness" note="Recorded share of each group, rather than its size">{empty||<ResponsiveContainer><BarChart data={groups} layout="vertical"><XAxis type="number" domain={[0,100]} unit="%" tick={{fontSize:9}}/><YAxis type="category" dataKey="name" width={85} tick={{fontSize:9}}/><Tooltip {...opts}/><Bar isAnimationActive={false} dataKey="recordedPercent" name="Recorded %" stackId="share" fill="#739bff"/><Bar isAnimationActive={false} dataKey="missingPercent" name="Missing %" stackId="share" fill="#d9e2ef"/></BarChart></ResponsiveContainer>}</Tile>
  <Tile title="Treemap · cohort size" note="Tile area represents number of sessions">{empty||<ResponsiveContainer><Treemap data={groups} dataKey="count" nameKey="name" aspectRatio={1.7} stroke="#fff" fill="#4ebcff"><Tooltip {...opts}/></Treemap></ResponsiveContainer>}</Tile>
  <Tile title="Combo · volume and recorded mean" note={`Bars: session count (left) · line: mean ${label} (right)`}>{empty||<ResponsiveContainer><ComposedChart data={groups}><CartesianGrid vertical={false} stroke="#eee"/><XAxis dataKey="name" tick={{fontSize:9}}/><YAxis yAxisId="count" allowDecimals={false} tick={{fontSize:9}}/><YAxis yAxisId="metric" orientation="right" tick={{fontSize:9}}/><Tooltip {...opts}/><Bar isAnimationActive={false} yAxisId="count" dataKey="count" name="Sessions" fill="#4ebcff" maxBarSize={35}/><Line isAnimationActive={false} yAxisId="metric" dataKey="value" name={`Mean ${label}`} stroke="#ffad72" strokeWidth={2} connectNulls={false}/></ComposedChart></ResponsiveContainer>}</Tile>
  <Tile title="Pie · cohort share" note="Session distribution across selected categories">{empty||<ResponsiveContainer><PieChart><Pie isAnimationActive={false} data={groups} nameKey="name" dataKey="count" outerRadius="75%">{groups.map((g,i)=><Cell key={g.name} fill={colors[i%colors.length]}/>)}</Pie><Tooltip {...opts}/><Legend wrapperStyle={{fontSize:9}}/></PieChart></ResponsiveContainer>}</Tile>
  <Tile title="Ranked bars · session volume" note="Categories ordered by recording count; no outcome ranking">{empty||<ResponsiveContainer><BarChart data={[...groups].sort((a,b)=>b.count-a.count)} layout="vertical"><XAxis type="number" allowDecimals={false} tick={{fontSize:9}}/><YAxis type="category" dataKey="name" width={85} tick={{fontSize:9}}/><Tooltip {...opts}/><Bar isAnimationActive={false} dataKey="count" name="Sessions" fill="#b099ff" maxBarSize={20}/></BarChart></ResponsiveContainer>}</Tile>
- </>;
+ </ChartWindow>;
 }

@@ -1,4 +1,5 @@
 'use client';
+import ChartWindow from '@/components/chart-window';
 import { useState } from 'react';
 import { Session, categoryValue, metrics } from '@/lib/segmentation';
 import { histogramBins, densityEstimate } from '@/lib/chart-distributions';
@@ -7,7 +8,7 @@ type Metric=(typeof metrics)[number][0];
 const colors=['#4ebcff','#35d4c0','#b099ff','#ffad72','#ff86c8'];
 function Tile({title,note,empty,children}:{title:string;note:string;empty?:string;children:React.ReactNode}) {return <section className="chart-card"><div className="chart-heading"><div><h3>{title}</h3><p>{note}</p></div></div><div className="chart-body">{empty?<p className="advanced-empty">{empty}</p>:children}</div></section>;}
 function recordingTime(r:Session){const value=r.timestamp??r.startTime;if(value===undefined)return null;const t=typeof value==='number'?(value<1e12?value*1000:value):Date.parse(value);return Number.isFinite(t)?t:null;}
-export default function ExtendedReportCharts({reports,metric,compare}:{reports:Session[];metric:Metric;compare:string}) {
+export default function ExtendedReportCharts({reports,metric,compare,start=0}:{reports:Session[];metric:Metric;compare:string;start?:number}) {
  const [replay,setReplay]=useState(0);
  const label=metrics.find(([key])=>key===metric)![1];
  const values=reports.flatMap(r=>typeof r[metric]==='number'&&Number.isFinite(r[metric])?[r[metric]!]:[]);
@@ -26,7 +27,7 @@ export default function ExtendedReportCharts({reports,metric,compare}:{reports:S
  const missingStack=stacked.length<2?'At least two recorded dates are required.':undefined;
  const opts={contentStyle:{background:'#fff',border:'1px solid #ddd',fontSize:10}};
  const axes=<><CartesianGrid stroke="#edf1f5"/><XAxis dataKey="time" type="number" domain={['dataMin','dataMax']} tickFormatter={v=>new Date(v).toLocaleDateString()} tick={{fontSize:9}}/><YAxis tick={{fontSize:9}}/><Tooltip {...opts} labelFormatter={v=>new Date(Number(v)).toLocaleString()}/></>;
- return <>
+ return <ChartWindow start={start} end={start+2}>
  <Tile title="Line chart · recorded measurements" note={`${label} · actual recording order; separate sessions`} empty={missingTime}><ResponsiveContainer><LineChart data={timeline}>{axes}<Line isAnimationActive={false} dataKey="value" name={label} type="linear" stroke={colors[0]} dot strokeWidth={2}/></LineChart></ResponsiveContainer></Tile>
  <Tile title="Area chart · recorded measurements" note={`${label} · shaded values, no inferred samples`} empty={missingTime}><ResponsiveContainer><AreaChart data={timeline}>{axes}<Area isAnimationActive={false} dataKey="value" name={label} type="linear" stroke={colors[1]} fill={colors[1]} fillOpacity={.2}/></AreaChart></ResponsiveContainer></Tile>
  <Tile title="Histogram · measured sessions" note={`${label} · ${values.length}/${reports.length} measured · equal-width bins`} empty={!values.length?'No measured values.':undefined}><ResponsiveContainer><BarChart data={bins}><XAxis dataKey="label" tick={{fontSize:8}}/><YAxis allowDecimals={false} tick={{fontSize:9}}/><Tooltip {...opts}/><Bar isAnimationActive={false} dataKey="count" name="Sessions" fill={colors[0]}/></BarChart></ResponsiveContainer></Tile>
@@ -40,5 +41,5 @@ export default function ExtendedReportCharts({reports,metric,compare}:{reports:S
  <Tile title="Distplot · frequency distribution" note={`${label} · bars and frequency polygon; no density inference`} empty={!values.length?'No measured values.':undefined}><ResponsiveContainer><ComposedChart data={bins}><XAxis dataKey="label" tick={{fontSize:8}}/><YAxis allowDecimals={false} tick={{fontSize:9}}/><Tooltip {...opts}/><Bar isAnimationActive={false} dataKey="count" name="Session count" fill="#c5e3ff"/><Line isAnimationActive={false} dataKey="count" name="Frequency polygon" type="linear" stroke={colors[0]} dot/></ComposedChart></ResponsiveContainer></Tile>
  <Tile title="Connected scatter · recording sequence" note="Activation (%) × peak (µV) · chronological sessions, not patient trajectory" empty={connected.length<2?'Two paired, timestamped sessions are required.':undefined}><ResponsiveContainer><ScatterChart><CartesianGrid stroke="#edf1f5"/><XAxis dataKey="activation" type="number" name="Activation" unit="%" tick={{fontSize:9}}/><YAxis dataKey="peak" type="number" name="Peak" unit="µV" tick={{fontSize:9}}/><Tooltip {...opts}/><Scatter isAnimationActive={false} data={connected} fill={colors[2]} line lineType="joint"/></ScatterChart></ResponsiveContainer></Tile>
  <Tile title="Density plot · estimated distribution" note={`${label} · Gaussian KDE, bandwidth from sample spread; descriptive only`} empty={!density.length?'Requires at least five measurements with variation.':undefined}><ResponsiveContainer><AreaChart data={density}><XAxis dataKey="x" type="number" domain={['dataMin','dataMax']} tick={{fontSize:9}}/><YAxis name="Density" tick={{fontSize:9}}/><Tooltip {...opts}/><Area isAnimationActive={false} dataKey="density" name="Estimated density" type="linear" stroke={colors[1]} fill={colors[1]} fillOpacity={.2}/></AreaChart></ResponsiveContainer></Tile>
- </>;
+ </ChartWindow>;
 }
