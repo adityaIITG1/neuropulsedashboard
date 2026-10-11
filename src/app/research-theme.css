@@ -1,0 +1,103 @@
+.powerbi-report {
+ --foreground:#e5f0ff;
+ color:#e5f0ff;
+ background:#07111e;
+ color-scheme:dark;
+ -webkit-font-smoothing:antialiased;
+}
+.powerbi-report .research-header {
+ background:linear-gradient(110deg,#0b1b2b,#0b1424 70%);
+ border-bottom:1px solid #204459;
+ box-shadow:0 4px 24px #0004;
+ height:60px;
+ padding:0 20px;
+}
+.powerbi-report .brand {color:#edf7ff;letter-spacing:-.5px}
+.powerbi-report .brand-icon {width:34px;height:34px;border-radius:10px;background:#0c353c;color:#40e2d2;border:1px solid #287170;box-shadow:0 0 18px #27c5bd20}
+.powerbi-report .brand-ai {color:#40e2d2}
+.powerbi-report .brand small {color:#90b2c6;letter-spacing:2px}
+.powerbi-report .connection {color:#c2e5df;font-size:10px;background:#102932;border:1px solid #224b50;padding:6px 10px;border-radius:20px}
+.powerbi-report .connection-error {color:#ffb3b3;background:#331e2a;border-color:#744055}
+.powerbi-report .last-sync {color:#8aa1b8}
+.powerbi-report .avatar {background:#163444;color:#52e5d8;border:1px solid #2a5364}
+.powerbi-report .icon-button {background:#102436;border-color:#2a455a;color:#a9c4d8}
+.powerbi-report .research-sidebar {top:60px;height:calc(100dvh - 60px);background:#0b1726;border-color:#1d3448;padding:20px 13px;scrollbar-color:#2b4c61 #0b1726}
+.powerbi-report .workspace-label {color:#7896ad;letter-spacing:1.7px}
+.powerbi-report .research-sidebar nav button.nav-active {background:linear-gradient(90deg,#123b43,#102534);border-left:3px solid #39dece;border-radius:6px;color:#67ebdf;padding:10px;font-size:11px}
+.powerbi-report .sidebar-divider {background:#1c3347;margin:18px 0}
+.powerbi-report .slicer-title {color:#c2d6e8}
+.powerbi-report .slicer-title span {background:#163449;color:#5cdfd4}
+.powerbi-report .slicer-help {color:#90a9bc}
+.powerbi-report .sidebar-search {border-color:#284258;background:#101f31;color:#88a7be}
+.powerbi-report .sidebar-search input {color:#edf7ff}
+.powerbi-report input::placeholder {color:#7692a9}
+.powerbi-report .slicer-fields label {color:#a2b8ca;font-size:9px}
+.powerbi-report .slicer-fields select,.powerbi-report .range-slicers input {background:#101f31;border:1px solid #284258;color:#d8e9f7;border-radius:5px;padding:6px;font-size:10px}
+.powerbi-report .range-slicers {color:#a2b8ca}
+.powerbi-report .reset-button {background:#10293a;border-color:#2a4a5e;color:#bdd5e6}
+.powerbi-report .sidebar-note {border-color:#20394b;color:#56ded1}
+.powerbi-report .sidebar-note small {color:#8aa5ba}
+.powerbi-report .research-main {
+ background:radial-gradient(ellipse at 80% 0%,#0d304140,transparent 55%),#07111e;
+ color:#e5f0ff;
+}
+.powerbi-main .page-heading h1 {color:#edf7ff;font-size:21px;letter-spacing:-.6px;font-weight:650}
+.powerbi-main .eyebrow {color:#47dacc;letter-spacing:1.6px;font-size:8px}
+.powerbi-main .page-heading p {color:#8aa7bd;font-size:9px}
+.powerbi-report .page-actions button {background:#112438;border-color:#2a465c;color:#bcd4e8;border-radius:7px}
+.powerbi-report button:hover:not(:disabled) {border-color:#4badb3;color:#81f0e6}
+.powerbi-report button:focus-visible,.powerbi-report select:focus-visible,.powerbi-report input:focus-visible {outline:2px solid #5ae4d8;outline-offset:3px}
+.powerbi-main .cohort-strip {background:#0d2430;border:1px solid #24505a;border-radius:7px;color:#9eb9c7}
+.powerbi-main .cohort-strip>span:first-child {color:#57dccc}
+.powerbi-main .cohort-strip strong {color:#b4f4e9}
+.powerbi-main .research-kpi {
+ background:linear-gradient(135deg,#12283b,#0d1d30);
+ border:1px solid #294459;border-top:2px solid #35cbbd;
+ border-radius:9px;box-shadow:0 5px 15px #0002;
+ position:relative;overflow:hidden;padding:12px;
+}
+.powerbi-main .research-kpi:nth-child(2) {border-top-color:#a291ff}
+.powerbi-main .research-kpi:nth-child(3) {border-top-color:#49c8ff}
+.powerbi-main .research-kpi:nth-child(4) {border-top-color:#f8bb65}
+.powerbi-main .research-kpi>div {color:#a8bfd1;font-size:10px}
+.powerbi-main .research-kpi strong {color:#eff8ff;font-size:26px;letter-spacing:-.8px;font-variant-numeric:tabular-nums}
+.powerbi-main .research-kpi strong small,.powerbi-main .research-kpi p {color:#8faac0}
+.powerbi-main .research-kpi strong.kpi-unavailable {color:#8aa5ba;font-size:19px;letter-spacing:-.5px}
+.powerbi-main .text-teal {color:#43e0cc}.powerbi-main .text-violet {color:#b09fff}.powerbi-main .text-blue {color:#55ccff}.powerbi-main .text-amber {color:#f8bb65}
+.powerbi-main .chart-toolbar h2 {color:#dcecff;font-size:12px}
+.powerbi-main .chart-toolbar span,.powerbi-main .chart-toolbar label {color:#90abc1}
+.powerbi-main .chart-toolbar select {background:#102337;border-color:#2a455a;color:#d2e7f8;border-radius:5px;font-size:10px}
+.powerbi-main .research-charts {gap:10px}
+.powerbi-main .chart-card {
+ background:linear-gradient(150deg,#102438,#0c1a2b);
+ border:1px solid #294257;border-radius:10px;padding:12px;
+ box-shadow:0 5px 18px #0002;position:relative;
+}
+.powerbi-main .chart-heading h3 {color:#e0edfa;font-size:11px;font-weight:600;letter-spacing:.05px}
+.powerbi-main .chart-heading p {color:#91aabd;font-size:9px;line-height:1.4}
+.powerbi-main .chart-heading>svg {color:#4e91ab}
+.powerbi-main .chart-empty,.powerbi-main .chart-empty p,.powerbi-main .advanced-empty {color:#9fb8cb}
+.powerbi-main .chart-empty>svg {color:#4b9da8}
+.powerbi-main .recharts-cartesian-grid line {stroke:#294257;stroke-opacity:.65}
+.powerbi-main .recharts-cartesian-axis-line,.powerbi-main .recharts-cartesian-axis-tick-line {stroke:#486077}
+.powerbi-main .recharts-cartesian-axis-tick-value,.powerbi-main .recharts-polar-angle-axis-tick-value,.powerbi-main .recharts-polar-radius-axis-tick-value {fill:#a9c1d4;font-size:10px}
+.powerbi-main .recharts-polar-grid line,.powerbi-main .recharts-polar-grid polygon {stroke:#34536b}
+.powerbi-main .recharts-legend-item-text {color:#b5cedf!important}
+.powerbi-main .recharts-default-tooltip {background:#0b2033!important;border:1px solid #3c647d!important;border-radius:8px!important;color:#e3f1ff!important;box-shadow:0 8px 30px #0006}
+.powerbi-main .recharts-tooltip-label {color:#e3f1ff!important}
+.powerbi-main .recharts-tooltip-cursor {fill:#5caac318;stroke:#466b84}
+.powerbi-main .recharts-sector {stroke:#102438;stroke-width:2px}
+.powerbi-main .histogram-replay {background:#153346;border-color:#2d566d;color:#a8e7e0;border-radius:5px}
+.powerbi-main .report-page-tabs {background:#0b1a2a;border:1px solid #223b50;border-radius:8px;padding:3px;gap:3px;margin-top:10px}
+.powerbi-main .report-page-tabs button {background:transparent;color:#93adc2;border-radius:5px;border-bottom:2px solid transparent;font-size:9px;padding:7px 9px}
+.powerbi-main .report-page-tabs button.selected {background:#153740;border-bottom-color:#45ddce;color:#83f4e5}
+.powerbi-main .report-page-tabs span {color:#7896ae}
+.powerbi-main .heatmap-table th,.powerbi-main .missing-matrix th {color:#a4bdd0}
+.powerbi-main .heatmap-table td {border:1px solid #2a4d5d}
+.powerbi-report .empty-banner {background:#102537;border-color:#2b465c;color:#b4cada}
+.powerbi-report .error-banner {background:#341f2b;border-color:#784154;color:#ffc0c7}
+@media(min-width:900px){.powerbi-main {height:calc(100dvh - 60px)}}
+@media(min-width:1600px){.powerbi-main .chart-heading h3{font-size:13px}.powerbi-main .chart-heading p{font-size:10px}.powerbi-main .research-kpi strong{font-size:30px}.powerbi-main .page-heading h1{font-size:25px}}
+@media(max-width:899px){.powerbi-main .report-page-6>.chart-card{grid-column:1/-1;grid-row:auto}}
+@media(max-width:760px){.powerbi-report .research-sidebar{height:auto;position:static}.powerbi-main .research-charts{grid-template-columns:1fr}.powerbi-main .research-kpi strong.kpi-unavailable{font-size:17px}.powerbi-report .research-header{padding:0 12px}.powerbi-report .connection{padding:4px 6px;font-size:8px}.powerbi-report .brand{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.powerbi-report .spin{animation:none}}

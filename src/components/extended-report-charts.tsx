@@ -4,7 +4,7 @@ import { Session, categoryValue, metrics } from '@/lib/segmentation';
 import { histogramBins, densityEstimate } from '@/lib/chart-distributions';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ComposedChart, Legend, Line, LineChart, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from 'recharts';
 type Metric=(typeof metrics)[number][0];
-const colors=['#118dff','#0d9488','#744ec2','#e66c37','#e044a7'];
+const colors=['#4ebcff','#35d4c0','#b099ff','#ffad72','#ff86c8'];
 function Tile({title,note,empty,children}:{title:string;note:string;empty?:string;children:React.ReactNode}) {return <section className="chart-card"><div className="chart-heading"><div><h3>{title}</h3><p>{note}</p></div></div><div className="chart-body">{empty?<p className="advanced-empty">{empty}</p>:children}</div></section>;}
 function recordingTime(r:Session){const value=r.timestamp??r.startTime;if(value===undefined)return null;const t=typeof value==='number'?(value<1e12?value*1000:value):Date.parse(value);return Number.isFinite(t)?t:null;}
 export default function ExtendedReportCharts({reports,metric,compare}:{reports:Session[];metric:Metric;compare:string}) {
