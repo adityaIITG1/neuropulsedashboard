@@ -8,6 +8,14 @@ function load(path, dependencies = {}, extra = {}) {
  vm.runInNewContext(code, {exports, require:name=>dependencies[name] || require(name), Buffer, AbortSignal, URL, process:{env:{}}, ...extra});
  return exports;
 }
+const {distribution,cumulative,metricPresent} = load('src/lib/research-statistics.ts');
+assert.equal(distribution([]),null);
+assert.equal(distribution([1,2,3,4]).median,2.5);
+assert.equal(distribution([1,2,3,4]).q1,1.75);
+assert.equal(distribution([1,1,1,1,100]).outliers.join(','),'100');
+assert.equal(cumulative([1,1,2])[0].percent,2/3*100);
+assert.equal(metricPresent({activePercent:0},'activePercent'),true);
+assert.equal(metricPresent({},'activePercent'),false);
 const {matchesSegment,categoryValue,reviewFlags} = load('src/lib/segmentation.ts');
 const report = {SessionId:'real-uuid',patientAge:'21 Y',patientGender:'Male',muscle:'Biceps',condition:'Recorded condition',activeTimeSec:45.2,activePercent:75.3,peakActiveEnvelope:120,averageActiveEnvelope:18.75,activityGrade:4,longestEpisodeSec:12,graphValues:[{}]};
 assert.equal(categoryValue(report,'ageGroup'),'18–25');
