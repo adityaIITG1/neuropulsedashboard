@@ -91,26 +91,28 @@ export default function NeuroPulseAnalyticsDashboard() {
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState('ALL');
   const [selectedGenderFilter, setSelectedGenderFilter] = useState('ALL');
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'FATIGUE' | 'TABLE'>('OVERVIEW');
-  const [dataSource, setDataSource] = useState<string>('AWS_DYNAMODB');
+  const [connected, setConnected] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   // Fetch reports from API Gateway / DynamoDB endpoint
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/reports');
+      const res = await fetch('/api/reports', { cache: 'no-store' });
       const data = await res.json();
-      if (data && data.reports) {
-        setReports(data.reports);
-        setDataSource(data.source || 'AWS_DYNAMODB');
-        if (!selectedSessionId && data.reports.length > 0) {
-          setSelectedSessionId(data.reports[0].SessionId);
-        }
-      }
-    } catch (e) {
-      console.error('Error fetching reports:', e);
+      if (!res.ok || !data.success || !Array.isArray(data.reports)) throw new Error(data.error || 'Unable to load reports. Please retry.');
+      setReports(data.reports);
+      setConnected(true);
+      setFetchError(null);
+      setLastRefreshed(new Date());
+      setSelectedSessionId(current => data.reports.some((report: ReportItem) => report.SessionId === current) ? current : (data.reports[0]?.SessionId || ''));
+    } catch (error) {
+      setReports([]);
+      setSelectedSessionId('');
+      setConnected(false);
+      setFetchError(error instanceof Error ? error.message : 'Unable to load reports. Please retry.');
     } finally {
       setLoading(false);
-      setLastRefreshed(new Date());
     }
   };
 
@@ -162,7 +164,7 @@ export default function NeuroPulseAnalyticsDashboard() {
 
   const avgGrade = useMemo(() => {
     if (!totalSessions) return 0;
-    const sum = filteredReports.reduce((acc, r) => acc + (r.activityGrade || 5), 0);
+    const sum = filteredReports.reduce((acc, r) => acc + (r.activityGrade ?? 0), 0);
     return +(sum / totalSessions).toFixed(2);
   }, [filteredReports, totalSessions]);
 
@@ -194,7 +196,8 @@ export default function NeuroPulseAnalyticsDashboard() {
   const ageDistributionData = useMemo(() => {
     const buckets: { [key: string]: number } = { '< 25 Y': 0, '25 - 40 Y': 0, '41 - 60 Y': 0, '60+ Y': 0 };
     filteredReports.forEach((r) => {
-      const ageNum = parseInt(r.patientAge || '30', 10);
+      const ageNum = parseInt(r.patientAge, 10);
+      if (!Number.isFinite(ageNum)) return;
       if (ageNum < 25) buckets['< 25 Y']++;
       else if (ageNum <= 40) buckets['25 - 40 Y']++;
       else if (ageNum <= 60) buckets['41 - 60 Y']++;
@@ -207,7 +210,7 @@ export default function NeuroPulseAnalyticsDashboard() {
   const patternData = useMemo(() => {
     const map: { [key: string]: number } = {};
     filteredReports.forEach((r) => {
-      const p = r.sessionPattern || 'SUSTAINED ACTIVATION';
+      const p = r.sessionPattern || 'Not reported';
       map[p] = (map[p] || 0) + 1;
     });
     return Object.entries(map).map(([name, value]) => ({ name, value }));
@@ -241,9 +244,9 @@ export default function NeuroPulseAnalyticsDashboard() {
         {/* Global Controls & Status */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className={`h-2 w-2 rounded-full ${loading ? 'bg-amber-400' : connected ? 'bg-emerald-400' : 'bg-red-400'}`}></span>
             <span className="text-slate-400">AWS DynamoDB:</span>
-            <span className="font-semibold text-emerald-400">ap-south-1 (Connected)</span>
+            <span className={`font-semibold ${fetchError ? 'text-red-400' : 'text-slate-200'}`}>{loading ? 'Checking reports?' : connected ? 'Reports API connected' : 'Connection failed'}</span>
           </div>
 
           <button
@@ -340,6 +343,10 @@ export default function NeuroPulseAnalyticsDashboard() {
 
       {/* 3. MAIN DASHBOARD CONTENT */}
       <main className="flex-1 p-6 space-y-6 max-w-[1700px] w-full mx-auto">
+        {fetchError && <div role="alert" className="rounded-xl border border-red-500/40 bg-red-950/30 p-5 text-red-200"><h2 className="font-bold">Reports connection failed</h2><p className="mt-1 text-sm">{fetchError}</p><p className="mt-1 text-sm">Use Sync AWS Data to retry. No reports are displayed while the connection is unavailable.</p></div>}
+        {!fetchError && reports.length === 0 && <div role="status" className="rounded-xl border border-slate-700 bg-slate-900 p-5"><h2 className="font-bold">{loading ? 'Loading real reports?' : 'No reports available'}</h2><p className="mt-1 text-sm text-slate-400">{loading ? 'Checking the reports service.' : 'The reports service returned no sessions. Upload a recording, then sync again.'}</p></div>}
+        {reports.length > 0 && filteredReports.length === 0 && <div role="status" className="rounded-xl border border-slate-700 p-5">No reports match these filters. Clear the filters to see your sessions.</div>}
+        {reports.length > 0 && <>
         {/* EXECUTIVE KPI SCORECARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Card 1: Total Sessions */}
@@ -394,8 +401,8 @@ export default function NeuroPulseAnalyticsDashboard() {
               <span className="text-xs font-semibold uppercase tracking-wider">Signal Quality</span>
               <Shield className="h-4 w-4 text-cyan-400" />
             </div>
-            <div className="text-3xl font-extrabold text-cyan-300 tracking-tight">100%</div>
-            <p className="text-[11px] text-emerald-400 mt-1">Acquisition Verified: GOOD</p>
+            <div className="text-3xl font-extrabold text-cyan-300 tracking-tight">{filteredReports.filter(r => r.signalQuality === 'GOOD').length} / {filteredReports.length}</div>
+            <p className="text-[11px] text-emerald-400 mt-1">Sessions reporting GOOD signal quality</p>
           </div>
         </div>
 
@@ -497,11 +504,11 @@ export default function NeuroPulseAnalyticsDashboard() {
                   <span className="text-xs text-slate-400">ID: {selectedSession?.SessionId?.slice(0, 18)}...</span>
                 </div>
                 <h4 className="text-lg font-bold text-white">
-                  {selectedSession?.muscle} ({selectedSession?.side} Side) — {selectedSession?.exercise || 'Wrist Flexion'}
+                  {selectedSession?.muscle} ({selectedSession?.side} Side) — {selectedSession?.exercise || 'Not reported'}
                 </h4>
                 <p className="text-xs text-slate-300 mt-2 leading-relaxed">
                   {selectedSession?.interpretationNarrative ||
-                    'Surface electrical activity was detected from the selected recording region.'}
+                    'No interpretation was included in this report.'}
                 </p>
               </div>
 
@@ -512,7 +519,7 @@ export default function NeuroPulseAnalyticsDashboard() {
                 </div>
                 <div>
                   <div className="text-[10px] text-slate-400 uppercase">Sustained Periods</div>
-                  <div className="text-base font-extrabold text-cyan-400">{selectedSession?.sustainedEpisodes || 1}</div>
+                  <div className="text-base font-extrabold text-cyan-400">{selectedSession?.sustainedEpisodes ?? 'N/A'}</div>
                 </div>
                 <div>
                   <div className="text-[10px] text-slate-400 uppercase">Peak Envelope</div>
@@ -520,7 +527,7 @@ export default function NeuroPulseAnalyticsDashboard() {
                 </div>
                 <div>
                   <div className="text-[10px] text-slate-400 uppercase">MVC Reference</div>
-                  <div className="text-base font-extrabold text-emerald-400">{selectedSession?.mvcReference || 49}</div>
+                  <div className="text-base font-extrabold text-emerald-400">{selectedSession?.mvcReference ?? 'N/A'}</div>
                 </div>
               </div>
             </div>
@@ -537,11 +544,11 @@ export default function NeuroPulseAnalyticsDashboard() {
                     FULL SESSION SURFACE EMG ACTIVITY TRACE & ENDURANCE TREND
                   </h3>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-500/30">
-                    {selectedSession?.activityGradeText || 'Grade 5 / 5'}
+                    {selectedSession?.activityGradeText || 'Grade not reported'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
-                  60-second synchronized sEMG activity envelope, raw firing bursts & yellow active contraction shading
+                  Recorded sEMG activity envelope and raw signal, when included in the report
                 </p>
               </div>
 
@@ -555,7 +562,7 @@ export default function NeuroPulseAnalyticsDashboard() {
                 >
                   {reports.map((r, idx) => (
                     <option key={r.SessionId} value={r.SessionId}>
-                      #{idx + 1}: {r.muscle} ({r.patientAge || '30Y'}, {r.patientGender || 'M'})
+                      #{idx + 1}: {r.muscle} ({r.patientAge || 'Age unavailable'}, {r.patientGender || 'Gender unavailable'})
                     </option>
                   ))}
                 </select>
@@ -629,7 +636,7 @@ export default function NeuroPulseAnalyticsDashboard() {
               </div>
               <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
                 <span className="text-slate-400 block text-[10px] uppercase">Sustained Episodes</span>
-                <span className="font-bold text-indigo-400 text-sm">{selectedSession?.sustainedEpisodes || 1}</span>
+                <span className="font-bold text-indigo-400 text-sm">{selectedSession?.sustainedEpisodes ?? 'N/A'}</span>
               </div>
               <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
                 <span className="text-slate-400 block text-[10px] uppercase">Median Rest</span>
@@ -690,14 +697,14 @@ export default function NeuroPulseAnalyticsDashboard() {
                       <td className="px-4 py-3 font-medium text-slate-200">
                         {item.recordingSite || `${item.side} ${item.muscle}`}
                       </td>
-                      <td className="px-4 py-3 text-slate-400">{item.exercise || 'Wrist Flexion'}</td>
+                      <td className="px-4 py-3 text-slate-400">{item.exercise || 'Not reported'}</td>
                       <td className="px-4 py-3 font-semibold text-teal-400">{item.activeTimeSec}s</td>
                       <td className="px-4 py-3 font-semibold text-emerald-400">{item.activePercent}%</td>
                       <td className="px-4 py-3 font-bold text-amber-400">{item.peakActiveEnvelope} µV</td>
                       <td className="px-4 py-3 text-slate-300">{item.averageActiveEnvelope}</td>
                       <td className="px-4 py-3">
                         <span className="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
-                          {item.activityGradeText || 'Grade 5/5'}
+                          {item.activityGradeText || 'Grade not reported'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-[11px] text-slate-400">{item.sessionPattern}</td>
@@ -708,6 +715,7 @@ export default function NeuroPulseAnalyticsDashboard() {
             </div>
           </div>
         )}
+        </>}
       </main>
 
       {/* FOOTER */}
