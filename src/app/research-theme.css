@@ -137,3 +137,4 @@
 .powerbi-report .powerbi-main .research-charts>.chart-card{display:flex!important}
 .powerbi-main .report-page-tabs{margin-top:0;margin-bottom:14px;flex-shrink:0}
 .metric-help{position:relative;cursor:help;color:#65e4d7;font-size:15px}.metric-help>span{display:none!important;position:absolute;right:0;top:24px;width:310px;z-index:40;background:#102c40;border:1px solid #45738b;border-radius:8px;padding:13px;color:#e4f2ff!important;font-size:12px!important;line-height:1.6;box-shadow:0 8px 24px #0008}.metric-help:hover>span,.metric-help:focus>span{display:block!important}.powerbi-main .research-kpi p{font-size:10px}
+.powerbi-main .chart-toolbar .metric-help{display:inline-flex;align-items:center}.powerbi-main .metric-help>span{display:none!important}.powerbi-main .metric-help:hover>span,.powerbi-main .metric-help:focus>span{display:block!important}
