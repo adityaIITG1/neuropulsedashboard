@@ -102,3 +102,69 @@
 @media(max-width:760px){.powerbi-report .research-sidebar{height:auto;position:static}.powerbi-main .research-charts{grid-template-columns:1fr}.powerbi-main .research-kpi strong.kpi-unavailable{font-size:17px}.powerbi-report .research-header{padding:0 12px}.powerbi-report .connection{padding:4px 6px;font-size:8px}.powerbi-report .brand{font-size:16px}}
 @media(prefers-reduced-motion:reduce){.powerbi-report .spin{animation:none}}
 @media(min-width:900px) and (max-height:740px){.powerbi-main .page-heading p{display:none}.powerbi-main .research-kpi{padding:8px 10px}.powerbi-main .research-kpi strong{font-size:23px;margin:5px 0 3px}.powerbi-main .chart-card{padding:9px}.powerbi-main .chart-heading h3{font-size:10px;margin-bottom:3px}.powerbi-main .chart-heading p{font-size:8px;line-height:1.25}.powerbi-main .chart-body,.powerbi-main .extra-chart-body{margin-top:5px}.powerbi-main .chart-toolbar span{display:none}.powerbi-main .page-heading h1{font-size:19px}}
+
+/* Large presentation canvas: two visuals per view. */
+.powerbi-main .chart-window-1>.chart-card{display:none!important}.powerbi-main .chart-window-1>.chart-card:nth-child(1),.powerbi-main .chart-window-1>.chart-card:nth-child(2){display:flex!important}
+.powerbi-main .chart-window-2>.chart-card{display:none!important}.powerbi-main .chart-window-2>.chart-card:nth-child(2),.powerbi-main .chart-window-2>.chart-card:nth-child(3){display:flex!important}
+.powerbi-main .chart-window-3>.chart-card{display:none!important}.powerbi-main .chart-window-3>.chart-card:nth-child(3),.powerbi-main .chart-window-3>.chart-card:nth-child(4){display:flex!important}
+.powerbi-main .chart-window-4>.chart-card{display:none!important}.powerbi-main .chart-window-4>.chart-card:nth-child(4),.powerbi-main .chart-window-4>.chart-card:nth-child(5){display:flex!important}
+.powerbi-main .chart-window-5>.chart-card{display:none!important}.powerbi-main .chart-window-5>.chart-card:nth-child(5),.powerbi-main .chart-window-5>.chart-card:nth-child(6){display:flex!important}
+.powerbi-main .chart-window-6>.chart-card{display:none!important}.powerbi-main .chart-window-6>.chart-card:nth-child(6),.powerbi-main .chart-window-6>.chart-card:nth-child(7){display:flex!important}
+.powerbi-main .chart-window-7>.chart-card{display:none!important}.powerbi-main .chart-window-7>.chart-card:nth-child(7),.powerbi-main .chart-window-7>.chart-card:nth-child(8){display:flex!important}
+.powerbi-main .chart-window-8>.chart-card{display:none!important}.powerbi-main .chart-window-8>.chart-card:nth-child(8),.powerbi-main .chart-window-8>.chart-card:nth-child(9){display:flex!important}
+.powerbi-main .chart-window-9>.chart-card{display:none!important}.powerbi-main .chart-window-9>.chart-card:nth-child(9),.powerbi-main .chart-window-9>.chart-card:nth-child(10){display:flex!important}
+.powerbi-main .chart-window-10>.chart-card{display:none!important}.powerbi-main .chart-window-10>.chart-card:nth-child(10),.powerbi-main .chart-window-10>.chart-card:nth-child(11){display:flex!important}
+.powerbi-main .chart-window-11>.chart-card{display:none!important}.powerbi-main .chart-window-11>.chart-card:nth-child(11),.powerbi-main .chart-window-11>.chart-card:nth-child(12){display:flex!important}
+.powerbi-main .chart-window-12>.chart-card{display:none!important}.powerbi-main .chart-window-12>.chart-card:nth-child(12),.powerbi-main .chart-window-12>.chart-card:nth-child(13){display:flex!important}
+.powerbi-main .chart-window-13>.chart-card{display:none!important}.powerbi-main .chart-window-13>.chart-card:nth-child(13),.powerbi-main .chart-window-13>.chart-card:nth-child(14){display:flex!important}
+.powerbi-main .chart-window-14>.chart-card{display:none!important}.powerbi-main .chart-window-14>.chart-card:nth-child(14),.powerbi-main .chart-window-14>.chart-card:nth-child(15){display:flex!important}
+.powerbi-main .chart-window-15>.chart-card{display:none!important}.powerbi-main .chart-window-15>.chart-card:nth-child(15),.powerbi-main .chart-window-15>.chart-card:nth-child(16){display:flex!important}
+.powerbi-main .chart-window-16>.chart-card{display:none!important}.powerbi-main .chart-window-16>.chart-card:nth-child(16),.powerbi-main .chart-window-16>.chart-card:nth-child(17){display:flex!important}
+.powerbi-main .chart-window-17>.chart-card{display:none!important}.powerbi-main .chart-window-17>.chart-card:nth-child(17),.powerbi-main .chart-window-17>.chart-card:nth-child(18){display:flex!important}
+.powerbi-main .chart-window-18>.chart-card{display:none!important}.powerbi-main .chart-window-18>.chart-card:nth-child(18),.powerbi-main .chart-window-18>.chart-card:nth-child(19){display:flex!important}
+.powerbi-main .chart-window-19>.chart-card{display:none!important}.powerbi-main .chart-window-19>.chart-card:nth-child(19),.powerbi-main .chart-window-19>.chart-card:nth-child(20){display:flex!important}
+.powerbi-main .chart-window-20>.chart-card{display:none!important}.powerbi-main .chart-window-20>.chart-card:nth-child(20),.powerbi-main .chart-window-20>.chart-card:nth-child(21){display:flex!important}
+.powerbi-main .chart-window-21>.chart-card{display:none!important}.powerbi-main .chart-window-21>.chart-card:nth-child(21),.powerbi-main .chart-window-21>.chart-card:nth-child(22){display:flex!important}
+.powerbi-main .chart-window-22>.chart-card{display:none!important}.powerbi-main .chart-window-22>.chart-card:nth-child(22),.powerbi-main .chart-window-22>.chart-card:nth-child(23){display:flex!important}
+.powerbi-main .chart-window-23>.chart-card{display:none!important}.powerbi-main .chart-window-23>.chart-card:nth-child(23),.powerbi-main .chart-window-23>.chart-card:nth-child(24){display:flex!important}
+.powerbi-main .chart-window-24>.chart-card{display:none!important}.powerbi-main .chart-window-24>.chart-card:nth-child(24),.powerbi-main .chart-window-24>.chart-card:nth-child(25){display:flex!important}
+.powerbi-main .chart-window-25>.chart-card{display:none!important}.powerbi-main .chart-window-25>.chart-card:nth-child(25),.powerbi-main .chart-window-25>.chart-card:nth-child(26){display:flex!important}
+.powerbi-main .chart-window-26>.chart-card{display:none!important}.powerbi-main .chart-window-26>.chart-card:nth-child(26),.powerbi-main .chart-window-26>.chart-card:nth-child(27){display:flex!important}
+.powerbi-main .chart-window-27>.chart-card{display:none!important}.powerbi-main .chart-window-27>.chart-card:nth-child(27),.powerbi-main .chart-window-27>.chart-card:nth-child(28){display:flex!important}
+.powerbi-main .chart-window-28>.chart-card{display:none!important}.powerbi-main .chart-window-28>.chart-card:nth-child(28),.powerbi-main .chart-window-28>.chart-card:nth-child(29){display:flex!important}
+.powerbi-main .chart-window-29>.chart-card{display:none!important}.powerbi-main .chart-window-29>.chart-card:nth-child(29),.powerbi-main .chart-window-29>.chart-card:nth-child(30){display:flex!important}
+.powerbi-main .chart-window-30>.chart-card{display:none!important}.powerbi-main .chart-window-30>.chart-card:nth-child(30),.powerbi-main .chart-window-30>.chart-card:nth-child(31){display:flex!important}
+.powerbi-main .chart-window-31>.chart-card{display:none!important}.powerbi-main .chart-window-31>.chart-card:nth-child(31),.powerbi-main .chart-window-31>.chart-card:nth-child(32){display:flex!important}
+.powerbi-main .chart-window-32>.chart-card{display:none!important}.powerbi-main .chart-window-32>.chart-card:nth-child(32),.powerbi-main .chart-window-32>.chart-card:nth-child(33){display:flex!important}
+.powerbi-main .chart-window-33>.chart-card{display:none!important}.powerbi-main .chart-window-33>.chart-card:nth-child(33),.powerbi-main .chart-window-33>.chart-card:nth-child(34){display:flex!important}
+.powerbi-main .chart-window-34>.chart-card{display:none!important}.powerbi-main .chart-window-34>.chart-card:nth-child(34),.powerbi-main .chart-window-34>.chart-card:nth-child(35){display:flex!important}
+.powerbi-main .research-charts{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:minmax(0,1fr);gap:18px}
+.powerbi-main .chart-card{padding:20px;border-radius:12px;grid-column:auto!important;grid-row:auto!important}
+.powerbi-main .chart-heading h3{font-size:16px;line-height:1.3;margin-bottom:6px}
+.powerbi-main .chart-heading p{font-size:12px;line-height:1.5;color:#a9bfd0}
+.powerbi-main .chart-body,.powerbi-main .extra-chart-body{margin-top:16px;min-height:180px}
+.powerbi-main .recharts-cartesian-axis-tick-value,.powerbi-main .recharts-polar-angle-axis-tick-value,.powerbi-main .recharts-polar-radius-axis-tick-value{font-size:12px}
+.powerbi-main .recharts-legend-wrapper{font-size:12px!important}
+.powerbi-main .chart-empty,.powerbi-main .chart-empty p,.powerbi-main .advanced-empty{font-size:13px}
+.powerbi-main .chart-toolbar{gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.powerbi-main .chart-toolbar h2{font-size:15px}
+.powerbi-main .chart-toolbar label,.powerbi-main .chart-toolbar select{font-size:11px}
+.powerbi-main .chart-toolbar>div{width:auto}
+.powerbi-main .chart-toolbar span{display:none}
+.chart-pagination{display:flex;align-items:center;gap:10px;margin-left:auto}
+.powerbi-main .chart-pagination span{display:block;font-size:11px;color:#b5cbdc;white-space:nowrap}
+.chart-pagination button{background:#123044;color:#b7ece8;border:1px solid #32586d;border-radius:6px;padding:5px 11px;font-size:16px}
+.powerbi-main .research-kpi{padding:9px 12px}
+.powerbi-main .research-kpi strong{font-size:25px;margin:5px 0 3px}
+.powerbi-main .research-kpi p{font-size:9px}
+.powerbi-main .research-kpi strong.kpi-unavailable{font-size:17px}
+.powerbi-main .page-heading{margin-bottom:12px}
+.powerbi-main .page-heading p{display:none}
+.powerbi-main .page-heading h1{font-size:24px}
+.powerbi-main .report-page-tabs button{font-size:11px;padding:9px 11px}
+.powerbi-main .report-page-tabs span{display:none}
+.powerbi-main .report-page-6>.chart-card{grid-column:1/-1!important}
+@media(min-width:900px){.powerbi-main{padding:18px 22px;overflow:auto}.powerbi-main .research-charts{min-height:280px}}
+@media(max-width:1100px){.powerbi-main .chart-heading h3{font-size:14px}.powerbi-main .chart-heading p{font-size:11px}.powerbi-main .chart-card{padding:16px}.powerbi-main .chart-toolbar>div{display:none}}
+@media(max-width:899px){.powerbi-main .research-charts{grid-template-columns:1fr;grid-auto-rows:340px;grid-template-rows:none}.powerbi-main .chart-pagination{margin-left:0}.powerbi-main .report-page-tabs{gap:4px}}
+.powerbi-main .chart-window-15>.chart-card:nth-child(16){display:none!important}.powerbi-main .chart-window-15>.chart-card:nth-child(15){grid-column:1/-1!important}
